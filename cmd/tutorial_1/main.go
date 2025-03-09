@@ -3,10 +3,10 @@ package main
 import (
 // "errors"
 "fmt"
-// "time"
+"time"
 // "unicode/utf8"
 // "strings"
-// "math/rand"
+"math/rand"
 // "sync"
 )
 
@@ -55,11 +55,15 @@ import (
 // var dbData = []string{"id1", "id2", "id3", "id4", "id5"}
 // var results = []string{}
 
+//Program that mocks checking for sales for chicken fingerd at walmart, costco and wholefoods
+var MAX_CHICKEN_PRICE float32 = 5 
+var MAX_TOFU_PRICE float32 = 5 
+
 func main() {
 	//     // Data types
-		var intnum int16 = 32767
-	    intnum = intnum + 1
-	    fmt.Println(intnum)
+		// var intnum int16 = 32767
+	    // intnum = intnum + 1
+	    // fmt.Println(intnum)
 
 	//     var floatNum float64 = 12345678.9
 	//     fmt.Println(floatNum)
@@ -371,7 +375,14 @@ func main() {
 	// }
 
 	//Program that mocks checking for sales for chicken fingerd at walmart, costco and wholefoods
-
+	var chickenChannel = make(chan string)
+	var tofuChannel = make(chan string)
+	var websites = []string{"walmart.com", "costco.com", "wholefoods.com"}
+	for i := range websites {
+		go checkChickenPrices(websites[i], chickenChannel)
+		go checkTofuPrices(websites[i], tofuChannel)
+	}
+	sendMessage(chickenChannel, tofuChannel)
 
 	}
 
@@ -460,3 +471,40 @@ func main() {
 // 	}
 // 	fmt.Println("Exiting Process")
 // }
+
+//Program that mocks checking for sales for chicken fingerd at walmart, costco and wholefoods
+func checkChickenPrices(website string, chickenChannel chan string) {
+	for {
+		time.Sleep(time.Second*1)
+		fmt.Println("Checking Chicken Price")
+		var chickenPrice = rand.Float32()*20
+		if chickenPrice <= MAX_CHICKEN_PRICE {
+			chickenChannel <- website
+			fmt.Println("Found suitable chicken price")
+			break
+		}
+	}
+}
+
+func checkTofuPrices(website string, tofuChannel chan string) {
+	for {
+		time.Sleep(time.Second*1)
+		fmt.Println("Checking Tofu Price")
+		var tofuPrice = rand.Float32()*20
+		if tofuPrice <= MAX_TOFU_PRICE {
+			fmt.Println("Found suitable tofu price")
+			tofuChannel <- website
+			break
+		}
+	}
+}
+
+func sendMessage(chickenChannel chan string, tofuChannel chan string) {
+	select {
+	case website := <-chickenChannel:
+		fmt.Printf("\nText Sent: Found a deal on chicken at %v", website)
+	case website := <-tofuChannel:
+		fmt.Printf("\nEmail Sent: Found a deal on Tofu at %v", website)
+	}
+	
+}
