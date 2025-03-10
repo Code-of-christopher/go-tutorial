@@ -3,28 +3,49 @@ package main
 import (
 // "errors"
 "fmt"
-"time"
+// "time"
 // "unicode/utf8"
 // "strings"
-"math/rand"
+// "math/rand"
 // "sync"
+// "encoding/json"
+// "os"
 )
 
-// //Structs and interfaces
-// type gasEngine struct {
-// 	mpg uint16
-// 	gallons uint16
-// 	ownerInfo owner //or
-// 	owner
-// }
+//Structs and interfaces
+type gasEngine struct {
+	mpg uint16
+	gallons uint16
+	// ownerInfo owner //or
+	// owner
+}
 
-// type electricEngine struct {
-// 	mpkwh uint16
-// 	kwh uint16
-// }
+type electricEngine struct {
+	mpkwh uint16
+	kwh uint16
+}
 
 // type owner struct {
 // 	name string
+// }
+
+//Generics with struct
+type car [T gasEngine | electricEngine]struct{
+	carMake string
+	carModel string
+	engine T
+}
+
+// //Inferring the type of Generic parameter
+// type contactInfo struct {
+// 	Name string
+// 	Email string
+// }
+
+// type purchaseInfo struct {
+// 	Name string
+// 	Price float32
+// 	Amount int
 // }
 
 // //struct methods
@@ -55,9 +76,9 @@ import (
 // var dbData = []string{"id1", "id2", "id3", "id4", "id5"}
 // var results = []string{}
 
-//Program that mocks checking for sales for chicken fingerd at walmart, costco and wholefoods
-var MAX_CHICKEN_PRICE float32 = 5 
-var MAX_TOFU_PRICE float32 = 5 
+// //Program that mocks checking for sales for chicken fingerd at walmart, costco and wholefoods
+// var MAX_CHICKEN_PRICE float32 = 5 
+// var MAX_TOFU_PRICE float32 = 5 
 
 func main() {
 	//     // Data types
@@ -374,15 +395,56 @@ func main() {
 	// 	time.Sleep(time.Second*1)
 	// }
 
-	//Program that mocks checking for sales for chicken fingerd at walmart, costco and wholefoods
-	var chickenChannel = make(chan string)
-	var tofuChannel = make(chan string)
-	var websites = []string{"walmart.com", "costco.com", "wholefoods.com"}
-	for i := range websites {
-		go checkChickenPrices(websites[i], chickenChannel)
-		go checkTofuPrices(websites[i], tofuChannel)
+	// //Program that mocks checking for sales for chicken fingerd at walmart, costco and wholefoods
+	// var chickenChannel = make(chan string)
+	// var tofuChannel = make(chan string)
+	// var websites = []string{"walmart.com", "costco.com", "wholefoods.com"}
+	// for i := range websites {
+	// 	go checkChickenPrices(websites[i], chickenChannel)
+	// 	go checkTofuPrices(websites[i], tofuChannel)
+	// }
+	// sendMessage(chickenChannel, tofuChannel)
+
+	// //Generics
+	// var intSlice4 = []int{1,2,3}
+	// fmt.Println(sumSlice(intSlice4))
+
+	// var float32Slice = []float32{1,2,3.6}
+	// fmt.Println(sumSlice(float32Slice))
+
+	// //Generics using type any
+	// var intSlice5 = []int{}
+	// fmt.Println(isEmpty(intSlice5))
+
+	// var float32Slice2 = []float32{1,2,3}
+	// fmt.Println(isEmpty(float32Slice2))
+
+	// //Inferring the type of Generic parameter
+	// var contacts []contactInfo = loadJSON[contactInfo]("./contactInfo.json")
+	// fmt.Printf("\n%+v", contacts)
+
+	// var purchases []purchaseInfo = loadJSON[purchaseInfo]("./purchaseInfo.json")
+	// fmt.Printf("\n%+v", purchases)
+
+	//Generics with struct
+	var gasCar = car[gasEngine] {
+		carMake: "Honda",
+		carModel: "Civic",
+		engine: gasEngine{
+			gallons: 12,
+			mpg: 40,
+		},
 	}
-	sendMessage(chickenChannel, tofuChannel)
+	var electricCar = car[electricEngine] {
+		carMake: "Tesla",
+		carModel: "Model 3",
+		engine: electricEngine{
+			kwh: 57,
+			mpkwh: 4,
+		},
+	}
+
+	fmt.Println(gasCar, electricCar)
 
 	}
 
@@ -472,39 +534,63 @@ func main() {
 // 	fmt.Println("Exiting Process")
 // }
 
-//Program that mocks checking for sales for chicken fingerd at walmart, costco and wholefoods
-func checkChickenPrices(website string, chickenChannel chan string) {
-	for {
-		time.Sleep(time.Second*1)
-		fmt.Println("Checking Chicken Price")
-		var chickenPrice = rand.Float32()*20
-		if chickenPrice <= MAX_CHICKEN_PRICE {
-			chickenChannel <- website
-			fmt.Println("Found suitable chicken price")
-			break
-		}
-	}
-}
+// //Program that mocks checking for sales for chicken fingerd at walmart, costco and wholefoods
+// func checkChickenPrices(website string, chickenChannel chan string) {
+// 	for {
+// 		time.Sleep(time.Second*1)
+// 		fmt.Println("Checking Chicken Price")
+// 		var chickenPrice = rand.Float32()*20
+// 		if chickenPrice <= MAX_CHICKEN_PRICE {
+// 			chickenChannel <- website
+// 			fmt.Println("Found suitable chicken price")
+// 			break
+// 		}
+// 	}
+// }
 
-func checkTofuPrices(website string, tofuChannel chan string) {
-	for {
-		time.Sleep(time.Second*1)
-		fmt.Println("Checking Tofu Price")
-		var tofuPrice = rand.Float32()*20
-		if tofuPrice <= MAX_TOFU_PRICE {
-			fmt.Println("Found suitable tofu price")
-			tofuChannel <- website
-			break
-		}
-	}
-}
+// func checkTofuPrices(website string, tofuChannel chan string) {
+// 	for {
+// 		time.Sleep(time.Second*1)
+// 		fmt.Println("Checking Tofu Price")
+// 		var tofuPrice = rand.Float32()*20
+// 		if tofuPrice <= MAX_TOFU_PRICE {
+// 			fmt.Println("Found suitable tofu price")
+// 			tofuChannel <- website
+// 			break
+// 		}
+// 	}
+// }
 
-func sendMessage(chickenChannel chan string, tofuChannel chan string) {
-	select {
-	case website := <-chickenChannel:
-		fmt.Printf("\nText Sent: Found a deal on chicken at %v", website)
-	case website := <-tofuChannel:
-		fmt.Printf("\nEmail Sent: Found a deal on Tofu at %v", website)
-	}
+// func sendMessage(chickenChannel chan string, tofuChannel chan string) {
+// 	select {
+// 	case website := <-chickenChannel:
+// 		fmt.Printf("\nText Sent: Found a deal on chicken at %v", website)
+// 	case website := <-tofuChannel:
+// 		fmt.Printf("\nEmail Sent: Found a deal on Tofu at %v", website)
+// 	}
 	
-}
+// }
+
+// //Generics
+// func sumSlice[T int | float32 | float64](slice []T) T {
+// 	var sum T
+// 	for _, v := range slice {
+// 		sum += v
+// 	}
+// 	return sum
+// }
+
+// //Generics using type any
+// func isEmpty[T any](slice []T) bool {
+// 	return len(slice)==0
+// }
+
+// //Inferring the type of Generic parameter
+// func loadJSON[T contactInfo | purchaseInfo](filePath string) []T {
+// 	data, _ = os.ReadFile(filePath)
+
+// 	var loaded = []T{}
+// 	json.Unmarshal(data, &loaded)
+
+// 	return loaded
+// }
